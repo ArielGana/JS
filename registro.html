@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/styleregister.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Formulario de Registro de Usuario</title>
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <a href="index.html"><img id="logo" src="img/10144779.png" alt="Logo de la Empresa"></a>
+            <li><a href="semillas.html">Semillas</a></li>
+            <li>
+                <a id="fertilizantes" href="fertilizantes.html?tipo=todo">Fertilizantes</a>
+                <ul class="submenu" id="fertilizantesSubmenu">
+                </ul>
+            </li>
+            <li>
+                <a id="plantas" href="plantas.html?tipo=todo">Plantas</a>
+                <ul class="submenu" id="plantasSubmenu">
+                </ul>
+            </li>
+            <li><a href="sustratos.html">Sustratos</a></li>
+            <li><a href="sustrato_preparados.html">Sustratos Preparados</a></li>
+            <li class="user-login"><a href="#"><img src="img/user.png" alt="Icono de Usuario"></a></li>
+        </ul>
+    </nav>
+
+    <form action="https://paginasweb88.000webhostapp.com/files/post_user.php" method="POST">
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required><br><br>
+
+        <label for="correo">Correo Electrónico:</label>
+        <input type="email" id="correo" name="correoElectronico" required><br><br>
+
+        <label for="contrasena">Contraseña:</label>
+        <input type="password" id="contrasena" name="contrasena" required><br><br>
+
+        <label for="ciudad">Ciudad:</label>
+        <select id="ciudad" name="ciudad" required>
+        </select><br><br>
+
+        <label for="region">Región:</label>
+        <select id="region" name="region_id">
+        </select><br><br>
+
+        <label for="comuna">Comuna:</label>
+        <select id="comuna" name="comuna" required>
+            <option value="" disabled selected>Selecciona una comuna</option>
+        </select><br><br>
+        <script>
+            $(document).ready(function () {
+                // Obtener referencias a los selects y inputs
+                var ciudadSelect = $('#ciudad');
+                var regionSelect = $('#region');
+                var comunaSelect = $('#comuna');
+
+                // Realizar una solicitud AJAX para obtener los datos de comunas, ciudades y regiones
+                $.ajax({
+                    url: 'https://paginasweb88.000webhostapp.com/files/get_com_reg.php', // Reemplaza 'tu_archivo_php.php' con la URL correcta
+                    dataType: 'json',
+                    success: function (data) {
+                        // Crear un objeto para almacenar las ciudades únicas y sus regiones
+                        var ciudadesUnicas = {};
+                        // Llenar el select de ciudades con las opciones correspondientes
+                        ciudadSelect.append('<option value="" disabled selected>Selecciona una ciudad</option>');
+                        $.each(data, function (i, item) {
+                            ciudadesUnicas[item.ciudad] = item.region;
+
+                        });
+
+                        // Agregar las ciudades únicas al select de ciudades
+                        for (var ciudad in ciudadesUnicas) {
+                            ciudadSelect.append('<option value="' + ciudad + '">' + ciudad + '</option>');
+                        }
+
+                        // Capturar el evento de cambio en el select de ciudades
+                        ciudadSelect.on('change', function () {
+                            var ciudadSeleccionada = $(this).val();
+
+                            if (ciudadSeleccionada) {
+                                var regionAsociada = ciudadesUnicas[ciudadSeleccionada];
+
+                                // Establecer la región correspondiente en el select de regiones
+                                regionSelect.val(regionAsociada);
+                                regionSelect.append('<option value="' + regionIdPorCiudad(data, ciudadSeleccionada) + '">' + regionAsociada + '</option>');
+
+                                // Limpiar y llenar el select de comunas con las comunas asociadas a la ciudad
+                                comunaSelect.empty();
+                                comunaSelect.append('<option value="" disabled selected>Selecciona una comuna</option>');
+                                $.each(data, function (i, item) {
+                                    if (item.ciudad == ciudadSeleccionada) {
+                                        comunaSelect.append('<option value="' + item.comuna_id + '">' + item.comuna + '</option>');
+                                    }
+                                });
+                            } else {
+                                // Si no se selecciona una ciudad, restablecer los selects
+                                regionSelect.val('');
+                                comunaSelect.empty();
+                                comunaSelect.append('<option value="" disabled selected>Selecciona una comuna</option>');
+                            }
+                        });
+
+                        // Función para obtener el ID de la región por nombre de ciudad
+                        function regionIdPorCiudad(data, ciudad) {
+                            for (var i = 0; i < data.length; i++) {
+                                if (data[i].ciudad === ciudad) {
+                                    return data[i].region_id;
+                                }
+                            }
+                            return '';
+                        }
+                    }
+                });
+            });
+        </script>
+        <label for="direccion">Dirección:</label>
+        <input type="text" id="direccion" name="direccion" required><br><br>
+
+
+        <label for="telefono">Teléfono:</label>
+        <input type="tel" id="telefono" name="telefono" required><br><br>
+
+        <input type="submit" value="Registrar">
+    </form>
+</body>
+
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Descripción del Producto</title>
+    <link rel="stylesheet" href="css/styledesc.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <a href="index.html"><img id="logo" src="img/10144779.png" alt="Logo de la Empresa"></a>
+            <li><a href="semillas.html">Semillas</a></li>
+            <li>
+                <a id="fertilizantes" href="fertilizantes.html?tipo=todo">Fertilizantes</a>
+                <ul class="submenu" id="fertilizantesSubmenu">
+                </ul>
+            </li>
+            <li>
+                <a id="plantas" href="plantas.html?tipo=todo">Plantas</a>
+                <ul class="submenu" id="plantasSubmenu">
+                </ul>
+            </li>
+            <li><a href="sustratos.html">Sustratos</a></li>
+            <li><a href="sustrato_preparados.html">Sustratos Preparados</a></li>
+            <li class="user-login"><a href="#"><img src="img/user.png" alt="Icono de Usuario"></a></li>
+        </ul>
+    </nav>
+    <div class="product-container">
+        <div id="imagen-container">
+            <!-- Las imágenes se mostrarán aquí -->
+        </div>
+        <img class="product-image" src="" alt="Error Imagen">
+
+        <div class="product-details">
+            <div class="product-name"></div>
+            <div class="product-description">
+
+            </div>
+            <div class="product-stock"></div>
+            <div class="product-anio"></div>
+            <div class="product-price"></div>
+
+            <div>
+                <label for="quantity"></label>
+                <button id="decrease" class="quantity-button">-</button>
+                <input id="quantity" class="product-quantity" value="1" min="1">
+                <button id="increase" class="quantity-button">+</button>
+                <br>
+                <button class="add-to-cart">Añadir</button>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="floating-button">
+        <a href="#">
+            <img src="img/carrito.png" alt="Carrito de compras">
+        </a>
+    </div>
+    <script>
+        // Obtener los elementos HTML
+        const decreaseButton = document.getElementById('decrease');
+        const increaseButton = document.getElementById('increase');
+        const quantityInput = document.getElementById('quantity');
+
+        // Agregar un evento de clic al botón de disminución (menos)
+        decreaseButton.addEventListener('click', () => {
+            // Obtener el valor actual del input
+            let currentValue = parseInt(quantityInput.value);
+
+            // Verificar que el valor sea mayor o igual al valor mínimo permitido (en este caso, 1)
+            if (currentValue > 1) {
+                // Disminuir el valor en 1
+                currentValue--;
+                // Actualizar el valor del input
+                quantityInput.value = currentValue;
+            }
+        });
+
+        // Agregar un evento de clic al botón de aumento (más)
+        increaseButton.addEventListener('click', () => {
+            // Obtener el valor actual del input
+            let currentValue = parseInt(quantityInput.value);
+
+            // Aumentar el valor en 1
+            currentValue++;
+            // Actualizar el valor del input
+            quantityInput.value = currentValue;
+        });
+
+    </script>
+    <script>
+        
+        // Obtén los parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tipo = urlParams.get('tipo');
+        const id = urlParams.get('id');
+        const stockQuantity = document.getElementById('product-stock');
+        let carpeta;
+        // Crea un FormData con los parámetros
+        const formData = new FormData();
+        formData.append('product', tipo);
+        formData.append('id', id);
+
+        // Realiza una solicitud POST al script PHP
+        fetch('https://paginasweb88.000webhostapp.com/files/get_producto_id.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(product => {
+                // Haz lo que desees con los datos del producto obtenido
+                document.querySelector('.product-image').src = product[0].Img;
+                document.querySelector('.product-name').textContent = product[0].Nombre;
+                document.querySelector('.product-description').textContent = product[0].Descripcion;
+                document.querySelector('.product-price').textContent = `Precio: ${product[0].PrecioFinal} pesos`;
+                document.querySelector('.product-anio').textContent = `Años Desde la Germinacion: ${product[0].Años} `;
+                document.querySelector('.product-stock').textContent = `Stock disponible: ${product[0].Cantidad_Disponibles} unidades`;
+                carpeta= product[0].carpeta;
+                const availableStock = parseInt(product[0].Cantidad_Disponibles);
+                const stockText = document.querySelector('.product-stock');
+
+
+                // Actualizar el texto y el estilo en función del stock
+                if (availableStock > 5) {
+                    stockText.textContent = `Stock disponible: ${availableStock} unidades`;
+                    stockText.classList.add('available');
+                    stockText.classList.remove('low-stock', 'out-of-stock');
+                } else if (availableStock > 0) {
+                    stockText.textContent = `Stock disponible: ${availableStock} unidades`;
+                    stockText.classList.add('low-stock');
+                    stockText.classList.remove('available', 'out-of-stock');
+                } else {
+                    stockText.textContent = 'Sin Stock';
+                    stockText.classList.add('out-of-stock');
+                    stockText.classList.remove('available', 'low-stock');
+                }
+                console.log(product);
+                img();
+                // Puedes mostrar los detalles del producto en este segundo HTML.
+            })
+            .catch(error => {
+                console.error('Error al cargar el producto:', error);
+            });
+        
+    </script>
+    <div id="myModal" class="modal">
+        <span class="close" id="closeModal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+    <script>
+         function img(){
+        // Ruta al script PHP que devuelve las URLs de las imágenes en formato JSON
+        const apiUrl = 'https://paginasweb88.000webhostapp.com/files/get_img.php';
+        const images = document.querySelectorAll('.imgcarpet');
+        const modal = document.getElementById('myModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+        console.log("este es el seguindo script"+carpeta);
+        // Crear un objeto FormData para enviar el parámetro por POST
+        const formData2 = new FormData();
+        formData2.append('ruta', carpeta); // Reemplaza 'miParametro' y 'valorDelParametro' con los valores deseados
+    
+        // Configurar la solicitud fetch para enviar datos por POST
+        const fetchOptions = {
+            method: 'POST',
+            body: formData2,
+        };
+    
+        // Obtener las URLs de las imágenes con fetch
+        fetch(apiUrl, fetchOptions)
+            .then(response => response.json())
+            .then(data => {
+                // Resto del código permanece igual
+                const imagenContainer = document.getElementById('imagen-container');
+                data.forEach(imageUrl => {
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.alt = 'Imagen';
+                    img.className = 'imgcarpet';
+                    img.addEventListener('click', () => {
+                        modal.style.display = 'block';
+                        modalImage.src = img.src;
+                    });
+                    imagenContainer.appendChild(img);
+                });
+            })
+            .catch(error => {
+                console.error('Error al obtener las imágenes:', error);
+            });
+    
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+    </script>
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Obtén las imágenes del contenedor
+            const imagesportada = document.querySelectorAll('.product-image');
+            const images = document.querySelectorAll('.imgcarpet');
+            const modal = document.getElementById('myModal');
+            const modalImage = document.getElementById('modalImage');
+            const closeModal = document.getElementById('closeModal');
+
+            // Agrega un evento de clic a cada imagen
+            images.forEach(img => {
+                img.addEventListener('click', () => {
+                    // Muestra el modal y la imagen en el modal
+                    modal.style.display = 'block';
+                    modalImage.src = img.src;
+                });
+            });
+
+            imagesportada.forEach(img => {
+                img.addEventListener('click', () => {
+                    // Muestra el modal y la imagen en el modal
+                    modal.style.display = 'block';
+                    modalImage.src = img.src;
+                });
+            });
+            // Agrega un evento de clic al botón de cierre del modal
+            closeModal.addEventListener('click', () => {
+                // Cierra el modal al hacer clic en el botón de cierre
+                modal.style.display = 'none';
+            });
+
+            // Cierra el modal si se hace clic fuera de él
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

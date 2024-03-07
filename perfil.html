@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuario</title>
+    <link rel="stylesheet" href="css/styleperfil.css">
+
+</head>
+<body>
+
+    <nav>
+        <ul>
+            <a href="index.html"><img id="logo" src="img/10144779.png" alt="Logo de la Empresa"></a>
+            <li><a href="semillas.html">Semillas</a></li>
+            <li>
+                <a id="fertilizantes" href="fertilizantes.html?tipo=todo">Fertilizantes</a>
+                <ul class="submenu" id="fertilizantesSubmenu">
+                </ul>
+            </li>
+            <li>
+                <a id="plantas" href="plantas.html?tipo=todo">Plantas</a>
+                <ul class="submenu" id="plantasSubmenu">
+                </ul>
+            </li>
+            <li><a href="sustratos.html">Sustratos</a></li>
+            <li><a href="sustrato_preparados.html">Sustratos Preparados</a></li>
+            <li class="user-login"><a href="#"><img src="img/user.png" alt="Icono de Usuario"></a></li>
+        </ul>
+    </nav>
+    <h1>Usuario</h1>
+    <form action="#" method="post">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" value="Juan Pérez" readonly required>
+
+        <label for="nombre">Apellido:</label>
+        <input type="text" id="nombre" name="nombre" value="Juan Pérez" readonly required>
+
+        <label for="nombre">Region:</label>
+        <input type="text" id="nombre" name="nombre" value="Juan Pérez" readonly required>
+
+        <label for="nombre">Comuna:</label>
+        <input type="text" id="nombre" name="nombre" value="Juan Pérez" readonly required>
+
+        <label for="nombre">Direccion:</label>
+        <input type="text" id="nombre" name="nombre" value="Juan Pérez"  readonly required>
+
+        <label for="email">Correo Electrónico:</label>
+        <input type="email" id="email" name="email" value="juan@example.com" required>
+
+        <label for="email">Contraseña:</label>
+        <input type="password" id="email" name="email" value="juan@example.com" required>
+
+        <label for="edad">Telefono:</label>
+        <input type="number" id="edad" name="edad" value="30" required>
+
+        <input type="submit" value="Guardar Cambios">
+    </form>
+    <form class="compras" action="#" method="post">
+        <h1>Compras</h1>
+    </form>
+</body>
+</html>

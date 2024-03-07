@@ -1,0 +1,337 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 0;
+    background-color: #f7f7f7;
+    margin: 0;
+}
+
+nav {
+    background-color: #28a745;
+    color: white;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Centra los elementos horizontalmente */
+}
+
+nav ul li {
+    margin: 0;
+    padding: 15px 20px;
+    position: relative;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+nav ul li:hover {
+    background-color: #218838;
+}
+
+/* Estilos para el submenú */
+.submenu {
+    display: none;
+    position: absolute;
+    background-color: #28a745;
+    border-top: 0px solid #1f7e39;
+    z-index: 1;
+    top: 100%;
+    /* Muestra el submenú justo debajo del elemento padre */
+    left: 0;
+    /* Alinea el submenú con el borde izquierdo del elemento padre */
+}
+
+nav ul li:hover .submenu {
+    display: block;
+}
+
+.submenu li {
+    padding: 10px 20px;
+}
+
+.submenu li a {
+    color: white;
+}
+
+
+/* Estilos para el icono de usuario */
+.user-login {
+    margin-left: auto;
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
+/* Estilo para el hover del icono de usuario */
+.user-login a:hover {
+    opacity: 0.8;
+}
+
+nav ul li a img {
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    /* Alinea verticalmente la imagen con el texto */
+    margin-left: 10px;
+    /* Agrega un margen a la izquierda para separar del texto */
+    order: 2;
+    /* Cambia el orden del elemento */
+}
+
+nav ul li .user-login {
+    margin-left: auto;
+    margin-right: 20px;
+    /* Ajusta el margen derecho para separar de los otros elementos */
+    display: flex;
+    /* Activa el sistema de flexbox para alinear el icono */
+    align-items: center;
+    /* Alinea verticalmente el icono con otros elementos */
+}
+
+#logo {
+    width: 50px;
+    height: 50px;
+    margin-left: 5px;
+}
+
+
+.product-container {
+    display: flex;
+    margin: 0 auto;
+    /* Centra horizontalmente el contenedor */
+    max-width: 600px;
+    /* Puedes ajustar el ancho máximo según tus preferencias */
+    min-height: auto;
+    /* Asegura que el contenedor tenga al menos la altura de la ventana */
+    /* Centra horizontalmente el contenido dentro del contenedor */
+    margin-top: 5%;
+    margin-left: 20%;   
+
+
+}
+
+.product-image {
+    width: 400px;
+    height: 500px;
+
+}
+
+.product-details {
+    flex: 1;
+    width: 500px;
+    margin-left: 50px;
+}
+
+.product-name {
+    font-size: 50px;
+    margin-bottom: 50px;
+    width: 500px;
+
+}
+
+.product-description {
+    margin-bottom: 10px;
+    width: 500px;
+}
+
+.product-price {
+    font-size: 20px;
+    margin-bottom: 50px;
+    width: 500px;
+    margin-top: 10px;
+}
+
+/* Estilos para el texto de stock */
+.product-stock {
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 50px;
+    width: 500px;
+}
+
+/* Estilos para el texto de stock en verde */
+.product-stock.available {
+    color: green;
+}
+
+/* Estilos para el texto de stock en naranja */
+.product-stock.low-stock {
+    color: orange;
+}
+
+/* Estilos para el texto de "Sin Stock" en rojo */
+.product-stock.out-of-stock {
+    color: red;
+}
+
+/* Estilos para el input */
+.product-quantity {
+    width: 50px;
+    /* Ancho deseado */
+    padding: 5px;
+    /* Espaciado interno */
+    border: 1px solid #ccc;
+    /* Borde con color de fondo */
+    border-radius: 5px;
+    /* Bordes redondeados */
+    font-size: 16px;
+    /* Tamaño de fuente */
+}
+
+/* Estilos para el input cuando está enfocado (opcional) */
+.product-quantity:focus {
+    outline: none;
+    /* Quita el borde predeterminado de enfoque */
+    border-color: #007bff;
+    /* Cambia el color del borde cuando se enfoca */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    /* Agrega una sombra cuando se enfoca */
+}
+
+/* Estilos para el contenedor de entrada */
+.quantity-input {
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos para los botones */
+.quantity-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
+    margin: 0 5px;
+    border-radius: 50%;
+}
+
+/* Estilo adicional para el botón de menos */
+#decrease {
+    background-color: #28a745;
+}
+
+
+.add-to-cart {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 30px;
+    margin-left: 7%;
+}
+
+.floating-button {
+    position: fixed;
+    bottom: 20px;
+    /* Distancia desde la parte inferior */
+    right: 20px;
+    /* Distancia desde la parte derecha */
+    width: 90px;
+    /* Tamaño del botón */
+    height: 90px;
+    /* Tamaño del botón */
+    border-radius: 50%;
+    /* Forma circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #32d45d;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.floating-button a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    text-align: center;
+}
+
+.floating-button img {
+    margin-top: 25%;
+    width: 50%;
+    /* Ajusta el tamaño del ícono */
+    height: auto;
+
+}
+
+.floating-button:hover {
+    background-color: #108d10;
+}
+
+/* Estilo para las imágenes dentro del contenedor */
+.imgcarpet {
+    width: 80px;
+    /* Ajusta el ancho máximo según tus preferencias */
+    height: 80px;
+    /* Mantiene la proporción de aspecto */
+    margin: 10px 0;
+    /* Añade espacio entre las imágenes */
+}
+
+/* Imagen principal */
+.product-image {
+    width: 100%;
+    /* Ajusta el ancho máximo de la imagen principal según tu diseño */
+    cursor: pointer;
+}
+
+/* Contenedor de imágenes adicionales */
+#imagen-container {
+    flex-direction: column; /* Coloca las imágenes una debajo de la otra */
+    align-items: center; /* Centra horizontalmente las imágenes en el contenedor */
+    margin-top: 0px; /* Ajusta el espaciado vertical entre la imagen principal y las imágenes adicionales */
+}
+
+/* Imágenes adicionales */
+#imagen-container img {
+    max-width: 100px; /* Ajusta el ancho máximo de las imágenes adicionales según tu diseño */
+    height: 80px; /* Mantiene la proporción de aspecto */
+    margin-top: 0px; /* Espacio entre las imágenes adicionales */
+    margin-right: 2px;
+    cursor: pointer;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+  }
+  
+  .modal-content {
+    margin: auto;
+    display: block;
+    width: 700px;
+    height: 700px;
+    margin-top: 5%;
+  }
+  
+  /* Estilos para el botón de cierre del modal */
+  .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .close:hover {
+    color: #ccc;
+  }

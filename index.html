@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Sitio de Jardinería</title>
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <a href="index.html"><img id="logo" src="img/10144779.png" alt="Logo de la Empresa"></a>
+            <li><a href="semillas.html">Semillas</a></li>
+            <li>
+                <a id="fertilizantes" href="fertilizantes.html?tipo=todo">Fertilizantes</a>
+                <ul class="submenu" id="fertilizantesSubmenu">
+                </ul>
+            </li>
+            <li>
+                <a id="plantas" href="plantas.html?tipo=todo">Plantas</a>
+                <ul class="submenu" id="plantasSubmenu">
+                </ul>
+            </li>
+            <li><a href="sustratos.html">Sustratos</a></li>
+            <li><a href="sustrato_preparados.html">Sustratos Preparados</a></li>
+            <li class="user-login"><a href="#"><img src="img/user.png" alt="Icono de Usuario"></a> <span id="user-info"></span></li>
+        </ul>
+    </nav>
+    <script>
+        // Función para verificar la sesión y actualizar el contenido del usuario
+        function verificarSesion() {
+            fetch('https://paginasweb88.000webhostapp.com/files/get_session.php')
+                .then(response => response.json())
+                .then(data => {
+                    const userLogin = document.querySelector('.user-login');
+                    const userInfo = document.querySelector('#user-info');
+
+                    console.log(data.sesion_abierta);
+                    if (data.sesion_abierta) {
+                        // La sesión está abierta, muestra el nombre de usuario y el enlace a "Ver Perfil"
+                        userInfo.innerHTML = `Bienvenido, ${data.usuario} | <a href="perfil.html">Ver Perfil</a>`;
+                    } else {
+                        // La sesión no está abierta, muestra el enlace para iniciar sesión
+                        userInfo.innerHTML = '<a href="iniciosesion.html">Iniciar Sesión</a>';
+                    }
+                });
+        }
+
+        // Llama a la función de verificación de sesión cuando se carga la página
+        verificarSesion();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const plantasSubmenu = document.getElementById('plantasSubmenu');
+            const enlacePlantas = document.getElementById('plantas');
+
+            // Función para cargar los productos
+            function loadProducts(filter) {
+                // Tu código para cargar productos aquí
+            }
+
+            // Obtener los tipos de plantas desde la base de datos
+            fetch('https://paginasweb88.000webhostapp.com/files/get_tipos.php')
+                .then(response => response.json())
+                .then(tipos => {
+                    // Generar las opciones del submenú basadas en los tipos
+                    var i = 0;
+                    tipos.forEach(tipo => {
+                        const urls = [
+                            'plantas.html?tipo=' + tipo,
+                        ];
+                        console.log(urls);
+                        const opcion = document.createElement('li');
+                        const enlaceOpcion = document.createElement('a');
+                        enlaceOpcion.textContent = tipo;
+                        enlaceOpcion.setAttribute('data-tipo', tipo); // Usamos un atributo personalizado para almacenar el tipo
+                        enlaceOpcion.classList.add('filtroTipo'); // Clase para agregar eventos
+                        enlaceOpcion.setAttribute('href', urls[i] || '#');  // Asignar la URL correspondiente o '#' si no existe
+                        opcion.appendChild(enlaceOpcion);
+                        plantasSubmenu.appendChild(opcion);
+                    });
+
+                    // Agregar eventos a las opciones del submenú
+                    const filtroTipos = document.querySelectorAll('.filtroTipo');
+                    filtroTipos.forEach(opcion => {
+                        opcion.addEventListener('click', function () {
+                            const tipo = this.getAttribute('data-tipo');
+                            loadProducts(tipo);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error al cargar tipos de plantas:', error));
+
+
+        });
+    </script>
+
+
+    <section id="featured-products">
+        <h2>Productos Destacados</h2>
+        <div class="product-list"></div>
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Obtener el contenedor de productos destacados
+            const productContainer = document.querySelector('.product-list');
+
+            // Función para cargar productos destacados de forma aleatoria
+            function loadFeaturedProducts() {
+                // Hacer una solicitud AJAX para obtener los datos de productos desde el servidor
+                fetch('https://paginasweb88.000webhostapp.com/files/get_plantas.php')
+                    .then(response => response.json())
+                    .then(products => {
+                        // Mostrar hasta 10 productos aleatorios
+                        const maxProductsToShow = 5;
+                        const shuffledProducts = shuffleArray(products).slice(0, maxProductsToShow);
+
+                        // Construir el HTML de los productos y agregarlo al contenedor
+                        const productsHTML = shuffledProducts.map(product => `
+                    <div class="product">
+                       <a href="#" class="expandable-image"> <img src="${product.Img}" alt="${product.Nombre}"></a>
+                        <h3>${product.Nombre}</h3>
+                        <p>${product.Descripcion}</p>
+                        <span>Precio: ${product.PrecioFinal} pesos</span>
+                        <br>
+                        <button id="buy">Añadir</button>
+                    </div>
+                `).join('');
+
+                        productContainer.innerHTML = productsHTML;
+                    })
+                    .catch(error => console.error('Error al cargar productos:', error));
+            }
+
+            // Función para mezclar un array
+            function shuffleArray(array) {
+                const shuffled = [...array];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            }
+
+            // Cargar productos destacados al cargar la página
+            loadFeaturedProducts();
+        });
+    </script>
+
+    <section id="producto-desc">
+        <h2>Productos En Descuento</h2>
+        <div class="product-desc"></div>
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Obtener el contenedor de productos destacados
+            const productContainer = document.querySelector('.product-desc');
+
+            // Función para cargar productos destacados de forma aleatoria
+            function loadFeaturedProducts() {
+                // Hacer una solicitud AJAX para obtener los datos de productos desde el servidor
+                fetch('https://paginasweb88.000webhostapp.com/files/get_descplantas.php')
+                    .then(response => response.json())
+                    .then(products => {
+                        // Mostrar hasta 10 productos aleatorios
+                        const maxProductsToShow = 5;
+                        const shuffledProducts = shuffleArray(products).slice(0, maxProductsToShow);
+
+                        // Construir el HTML de los productos y agregarlo al contenedor
+                        const productsHTML = shuffledProducts.map(product => `
+                      <div class="productDesc">
+                          <ahref="desc.html?tipo=Planta&id=${product.ID}" class="expandable-image" data-tipo="planta" data-id="${product.ID}" class="expandable-image"><img src="${product.Img}" alt="${product.Nombre}"></a>
+                          <h3>${product.Nombre}</h3>
+                          <p>${product.Descripcion}</p>
+                          <p>Descuento del : ${product.Descuento}% </p>
+                          <span>Precio: ${product.PrecioFinal} pesos</span>
+                          <br>
+                        <button id="buy">Añadir</button>
+                      </div>
+                  `).join('');
+
+                        productContainer.innerHTML = productsHTML;
+                    })
+                    .catch(error => console.error('Error al cargar productos:', error));
+            }
+
+            // Función para mezclar un array
+            function shuffleArray(array) {
+                const shuffled = [...array];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            }
+
+            // Cargar productos destacados al cargar la página
+            loadFeaturedProducts();
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const plantasSubmenu = document.getElementById('fertilizantesSubmenu');
+
+            // Función para cargar los productos
+            function loadProducts(filter) {
+                const formData = new FormData();
+                formData.append('tipo', filter);
+
+                fetch('https://paginasweb88.000webhostapp.com/files/get_filter_ferti.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(products => {
+                        // Construir el HTML de los productos y agregarlo al contenedor
+                        const productsHTML = products.map(product => `
+                    <div class="product">
+                       <a href="#" class="expandable-image"> <img src="Fertilizantes/${product.Img}" alt="${product.Nombre}"></a>
+                        <h3>${product.Nombre}</h3>
+                        <p>${product.Descripcion}</p>
+                        <span>Precio: ${product.PrecioFinal} pesos</span>
+                        <br>
+                            <button id="buy">Añadir</button>
+                    </div>
+                `).join('');
+
+                    })
+                    .catch(error => console.error('Error al cargar productos:', error));
+            }
+
+            // Agregar evento de clic a las opciones del menú
+            document.getElementById("fertilizantes").addEventListener("click", function () {
+                loadProducts('todo');
+            });
+
+            // Obtener los tipos de plantas desde la base de datos
+            fetch('https://paginasweb88.000webhostapp.com/files/get_tipos_ferti.php')
+                .then(response => response.json())
+                .then(tipos => {
+                    // Definir URLs personalizadas para cada tipo
+
+                    var i = 0;
+                    // Generar las opciones del submenú basadas en los tipos
+                    tipos.forEach(tipo => {
+                        const urls = [
+                            'fertilizantes.html?tipo=' + tipo
+                        ];
+                        const opcion = document.createElement('li');
+                        const enlaceOpcion = document.createElement('a');
+                        enlaceOpcion.textContent = tipo;
+                        enlaceOpcion.setAttribute('data-tipo', tipo); // Atributo personalizado para almacenar el tipo
+                        enlaceOpcion.classList.add('filtroTipo'); // Clase para agregar eventos
+                        enlaceOpcion.setAttribute('href', urls[i] || '#');  // Asignar la URL correspondiente o '#' si no existe
+                        i++;
+                        opcion.appendChild(enlaceOpcion);
+                        plantasSubmenu.appendChild(opcion);
+                    });
+
+                    // Agregar eventos a las opciones del submenú
+                    const filtroTipos = document.querySelectorAll('.filtroTipo');
+                    filtroTipos.forEach(opcion => {
+                        opcion.addEventListener('click', function () {
+                            const tipo = this.getAttribute('data-tipo');
+                            loadProducts(tipo);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error al cargar tipos de plantas:', error));
+
+            // Cargar productos al cargar la página (sin filtro)
+            loadProducts('todo');
+        });
+    </script>
+
+
+    <section id="about-us">
+        <img id="viveroimg" src="img/Vivero.jpg" alt="Icono de Usuario">
+        <div class="about-content">
+            <h2> Sobre Nosotros: Cultivando Belleza y Pasión por la Naturaleza</h2>
+            <div class="about-text">
+                En "El Jardín Verde", no somos solo un vivero; somos un espacio donde la naturaleza y la pasión
+                convergen para crear una experiencia única. Con un profundo amor por las plantas y un compromiso
+                inquebrantable con la belleza natural, compartimos la magia de la jardinería y la agricultura. Nuestro
+                propósito es nutrir cuerpo y alma a través de una variedad de plantas que capturan la esencia de la
+                naturaleza en pleno. Desde flores exuberantes hasta árboles frutales y suculentas encantadoras, cada
+                planta promete crecimiento y transformación. Además, ofrecemos una amplia gama de suministros de
+                agricultura, desde sustratos hasta herramientas especializadas, para satisfacer todas las necesidades.
+                Educamos y empoderamos a nuestros visitantes con el conocimiento de nuestro equipo de jardineros
+                apasionados. Queremos crear un espacio donde todos puedan aprender, crecer y conectarse con la
+                naturaleza. Te invitamos a explorar nuestra colección, sumergirte en la belleza natural y unirte a
+                nuestra comunidad dedicada a la jardinería y la agricultura. Cada planta que adquieres es una inversión
+                en la salud y el bienestar de tu entorno y espíritu. Únete a nosotros en este viaje lleno de color,
+                fragancia y vida en "El Jardín Verde".
+            </div>
+        </div>
+    </section>
+
+
+
+    <section id="additional-info">
+        <div class="info-container">
+            <div class="info-item">
+                <h3>Vivero</h3>
+                <a href="index.html"><img id="iconvivero" src="img/10144779.png"></a>
+            </div>
+            <div class="info-item">
+                <h3>Metodos De Pago</h3>
+                <img id="iconwebpay" src="img/iconwebpay.webp">
+            </div>
+            <div class="info-item">
+                <h3>Contacto</h3>
+                <p>Puedes contactarnos En Nuestras Redes Sociales </p>
+                <a href="#"><img id="icons" src="img/iconinsta.png"></a>
+                <a href="#"><img id="icons" src="img/iconface.png"></a>
+                <a href="#"><img id="icons" src="img/iconwhat.png"></a>
+            </div>
+        </div>
+    </section>
+    <div class="floating-button">
+        <a href="#">
+            <img src="img/carrito.png" alt="Carrito de compras">
+        </a>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lista de Plantas</title>
+    <link rel="stylesheet" href="css/styleplantas.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <a href="index.html"><img id="logo" src="img/10144779.png" alt="Logo de la Empresa"></a>
+            <li><a href="semillas.html">Semillas</a></li>
+            <li>
+                <a id="fertilizantes" href="fertilizantes.html?tipo=todo">Fertilizantes</a>
+                <ul class="submenu" id="fertilizantesSubmenu">
+                </ul>
+            </li>
+            <li>
+                <a id="plantas" href="plantas.html?tipo=todo">Plantas</a>
+                <ul class="submenu" id="plantasSubmenu">
+                </ul>
+            </li>
+            <li><a href="sustratos.html">Sustratos</a></li>
+            <li><a href="sustrato_preparados.html">Sustratos Preparados</a></li>
+            <li class="user-login"><a href="#"><img src="img/user.png" alt="Icono de Usuario"></a></li>
+        </ul>
+    </nav>
+    <section id="featured-products">
+        <h2>Plantas Disponibles</h2>
+        <div class="product-list"></div>
+    </section>
+    <div class="floating-button">
+        <a href="#">
+            <img src="img/carrito.png" alt="Carrito de compras">
+        </a>
+        <div id="counter" class="counter">0</div>
+    </div>
+    <div class="cart-content" style="right: -500px;"> 
+        <div class="top">
+            <h1>Carro De Compras</h1>
+            <button class="btnes" id="close">Cerrar</button>
+            <button class="btnes" id="compra">Comprar</button>
+        </div>
+
+        <!-- Aquí se mostrarán los productos del carrito -->
+
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            let totalCantidad = 0;
+            let id;
+
+
+
+
+            // Función para obtener y actualizar la cantidad del carrito
+            function obtenerDatosCarrito() {
+                return fetch('https://paginasweb88.000webhostapp.com/files/ver_carro.php')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('No se pudo obtener la cantidad del carrito.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Respuesta JSON:', data);
+
+                        if (data.carrito) {
+                            data.carrito.forEach(producto => {
+                                const cantidad = parseInt(producto.cantidad);
+                                id = parseInt(producto.ID);
+                                totalCantidad += cantidad;
+                            });
+
+                            const contador = document.getElementById('counter');
+                            contador.textContent = totalCantidad;
+                        }
+
+                        // Llama a la función para obtener los detalles de los productos y devuelve su promesa
+                        return obtenerDatosArticulos(data, "Planta");
+                    })
+                    .then(() => {
+                        console.log('Todas las solicitudes de detalles de productos se completaron.');
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener la cantidad del carrito:', error);
+                    });
+            }
+
+            function obtenerDatosArticulos(carritoData, tabla) {
+                const cartContent = document.querySelector('.cart-content'); // Obtén una referencia al elemento con la clase "cart-content"
+
+                const promesas = carritoData.carrito.map(producto => {
+                    const formData = new FormData();
+                    formData.append('product', tabla);
+                    formData.append('id', producto.ID); // Usar producto.ID en lugar de producto.id
+                    return fetch('https://paginasweb88.000webhostapp.com/files/get_producto_id.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`No se pudieron obtener los detalles del artículo con ID ${producto.ID}.`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log(`Detalles del artículo con ID ${producto.ID}:`, data);
+                            // Crea un elemento div para mostrar los detalles del producto
+                            const productoDiv = document.createElement('div');
+                            productoDiv.classList.add('cart-item');
+
+
+                            const imagen = document.createElement('img');
+                            imagen.id = 'imgcart';
+                            imagen.src = data[0].Img; // Establece la URL de la imagen
+
+                            // Crea elementos para mostrar los detalles del producto
+                            const nombreProducto = document.createElement('p');
+                            nombreProducto.textContent = `Nombre: ${data[0].Nombre}`;
+
+                            const precioProducto = document.createElement('p');
+                            precioProducto.textContent = `Precio: $${data[0].Precio}`;
+
+
+                            // Agrega los elementos al div del producto
+                            productoDiv.appendChild(nombreProducto);
+                            productoDiv.appendChild(precioProducto);
+                            productoDiv.appendChild(imagen);
+
+                            // Agrega el div del producto al contenido del carrito
+                            cartContent.appendChild(productoDiv);
+
+
+                        })
+                        .catch(error => {
+                            console.error(`Error al obtener los detalles del artículo con ID ${producto.ID}:`, error);
+                        });
+                });
+
+                // Espera a que se completen todas las solicitudes y maneja los errores
+                return Promise.all(promesas);
+            }
+            const cartContent = document.querySelector('.cart-content');
+            const floatingButton = document.querySelector('.floating-button');
+            const butonClose = document.getElementById('close');
+            // Manejar clic en el botón flotante
+            floatingButton.addEventListener('click', function () {
+
+                if (cartContent.style.right === '0px') {
+                    // Si el panel ya está visible, ocúltalo
+                    cartContent.style.right = '-500px'; // O vuelve a la posición inicial fuera de la pantalla
+                    cartContent.style.border = '0px solid white';
+                    productoDiv.style.border='0px';
+                } else {
+                    // Si el panel está oculto, muéstralo
+                    cartContent.style.right = '0px'; // O la posición deseada para mostrarlo
+                }
+            });
+
+
+            butonClose.addEventListener('click', function () {
+                cartContent.style.right = '-500px'; // Oculta el panel lateral al hacer clic en el botón
+            });
+
+            // Llama a la función para obtener los datos del carrito
+            obtenerDatosCarrito();
+
+            const productContainer = document.querySelector('.product-list');
+            const plantasSubmenu = document.getElementById('plantasSubmenu');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const filtro = urlParams.get('tipo');
+
+
+            // Función para cargar los productos
+            function loadProducts(filtro) {
+                const formData = new FormData();
+                formData.append('tipo', filtro);
+                fetch('https://paginasweb88.000webhostapp.com/files/get_filter.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(products => {
+                        // Construir el HTML de los productos y agregarlo al contenedor
+                        const productsHTML = products.map(product => `
+        <div class="product">
+            <a href="desc.html?tipo=Planta&id=${product.ID}" class="expandable-image" data-tipo="planta"
+                data-id="${product.ID}">
+                <img src="${product.Img}" alt="${product.Nombre}">
+            </a>
+            <h3>${product.Nombre}</h3>
+            <p>${product.Descripcion}</p>
+            ${product.Descuento !== null ? `<span id="desc">Descuento: ${product.Descuento} %</span>` + `<br> <span
+                id="precio">Precio: ${product.PrecioFinal} Pesos</span>` : ` <span id="precio">Precio:
+                ${product.PrecioFinal} Pesos</span>`}
+            <br>
+            <button id="buy">Añadir</button>
+        </div>
+        `).join('');
+
+
+                        productContainer.innerHTML = productsHTML;
+                    })
+                    .catch(error => console.error('Error al cargar productos:', error));
+            }
+
+
+
+            // Variable para almacenar el ID y el precio del producto seleccionado
+            let selectedProductInfo = null;
+            const contador = document.getElementById('counter');
+
+            // Agrega un evento de clic a todos los botones con id "buy" dentro del contenedor de productos
+            productContainer.addEventListener('click', (event) => {
+
+
+                if (event.target.id === 'buy') {
+                    // Obtén el contenedor del producto padre del botón clicado 
+                    totalCantidad++;
+                    contador.textContent = totalCantidad;
+                    const productDiv = event.target.closest('.product');
+
+                    // Obtiene el ID del producto desde el atributo de datos del enlace
+                    const productId = productDiv.querySelector('a').getAttribute('data-id');
+
+                    selectedProductInfo = {
+                        id: productId,
+                    };
+                    const formData = new FormData();
+
+                    formData.append('planta_id', selectedProductInfo.id);
+                    formData.append('cantidad', 1);
+
+                    // Luego, utiliza fetch para enviar los datos al servidor PHP
+                    fetch('https://paginasweb88.000webhostapp.com/files/session_carrito.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            // Haz algo con la respuesta del servidor si es necesario
+                            console.log(data);
+                        })
+                        .catch(error => console.error('Error al enviar los datos:', error));
+
+                    // Puedes hacer lo que desees con selectedProductInfo aquí, como agregarlo al carrito de compras o realizar otras
+                    console.log(selectedProductInfo);
+                }
+            });
+
+
+
+
+
+
+
+            // Agregar evento de clic a las opciones del menú
+            document.getElementById("plantas").addEventListener("click", function () {
+                loadProducts(filtro);
+            });
+
+            // Obtener los tipos de plantas desde la base de datos
+            fetch('https://paginasweb88.000webhostapp.com/files/get_tipos.php')
+                .then(response => response.json())
+                .then(tipos => {
+                    // Generar las opciones del submenú basadas en los tipos
+
+                    var i = 0;
+                    tipos.forEach(tipo => {
+                        const urls = [
+                            'plantas.html?tipo=' + tipo,
+                        ];
+                        const opcion = document.createElement('li');
+                        const enlaceOpcion = document.createElement('a');
+                        enlaceOpcion.textContent = tipo;
+                        enlaceOpcion.setAttribute('data-tipo', tipo); // Usamos un atributo personalizado para almacenar el tipo
+                        enlaceOpcion.classList.add('filtroTipo'); // Clase para agregar eventos
+                        enlaceOpcion.setAttribute('href', urls[i] || '#'); // Asignar la URL correspondiente o '#' si no existe
+                        opcion.appendChild(enlaceOpcion);
+                        plantasSubmenu.appendChild(opcion);
+                    });
+
+                    // Agregar eventos a las opciones del submenú
+                    const filtroTipos = document.querySelectorAll('.filtroTipo');
+                    filtroTipos.forEach(opcion => {
+                        opcion.addEventListener('click', function () {
+                            const tipo = this.getAttribute('data-tipo');
+                            loadProducts(tipo);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error al cargar tipos de plantas:', error));
+
+            // Cargar productos al cargar la página (sin filtro)
+            loadProducts(filtro);
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const productContainer = document.querySelector('.product-list');
+            const plantasSubmenu = document.getElementById('fertilizantesSubmenu');
+            const enlacePlantas = document.getElementById('fertilizantes');
+
+
+            // Obtener los tipos de plantas desde la base de datos
+            fetch('https://paginasweb88.000webhostapp.com/files/get_tipos_ferti.php')
+                .then(response => response.json())
+                .then(tipos => {
+                    // Generar las opciones del submenú basadas en los tipos
+                    var i = 0;
+                    // Generar las opciones del submenú basadas en los tipos
+                    tipos.forEach(tipo => {
+                        const urls = [
+                            'fertilizantes.html?tipo=' + tipo
+                        ];
+                        const opcion = document.createElement('li');
+                        const enlaceOpcion = document.createElement('a');
+                        enlaceOpcion.textContent = tipo;
+                        enlaceOpcion.setAttribute('data-tipo', tipo); // Usamos un atributo personalizado para almacenar el tipo
+                        enlaceOpcion.classList.add('filtroTipo'); // Clase para agregar eventos
+                        enlaceOpcion.setAttribute('href', urls[i] || '#');  // Asignar la URL correspondiente o '#' si no existe
+                        opcion.appendChild(enlaceOpcion);
+                        plantasSubmenu.appendChild(opcion);
+                    });
+
+                    // Agregar eventos a las opciones del submenú
+                    const filtroTipos = document.querySelectorAll('.filtroTipo');
+                    filtroTipos.forEach(opcion => {
+                        opcion.addEventListener('click', function () {
+                            const tipo = this.getAttribute('data-tipo');
+                            loadProducts(tipo);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error al cargar tipos de plantas:', error));
+
+
+        });
+    </script>
+
+
+    <section id="additional-info">
+        <div class="info-container">
+            <div class="info-item">
+                <h3>Vivero</h3>
+                <a href="index.html"><img id="iconvivero" src="img/10144779.png"></a>
+            </div>
+            <div class="info-item">
+                <h3>Metodos De Pago</h3>
+                <img id="iconwebpay" src="img/iconwebpay.webp">
+            </div>
+            <div class="info-item">
+                <h3>Contacto</h3>
+                <p>Puedes contactarnos En Nuestras Redes Sociales </p>
+                <a href="#"><img id="icons" src="img/iconinsta.png"></a>
+                <a href="#"><img id="icons" src="img/iconface.png"></a>
+                <a href="#"><img id="icons" src="img/iconwhat.png"></a>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
